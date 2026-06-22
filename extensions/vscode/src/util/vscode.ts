@@ -22,7 +22,8 @@ export function getNonce() {
 }
 
 export function getExtensionUri(): vscode.Uri {
-  return vscode.extensions.getExtension("Continue.continue")!.extensionUri;
+  return vscode.extensions.getExtension("mediologysoftware.code-assistant")!
+    .extensionUri;
 }
 
 export function getViewColumnOfFile(
