@@ -18,6 +18,31 @@ const skillFrontmatterSchema = z.object({
 const SKILLS_DIR = "skills";
 
 /**
+ * Get SKILL.md files from a skills directory using ide.listDir directly,
+ * bypassing walkDir's ignore system which can filter out .claude/ paths.
+ */
+async function getSkillFilesFromDir(ide: IDE, dir: string): Promise<string[]> {
+  try {
+    const exists = await ide.fileExists(dir);
+    if (!exists) return [];
+    const entries = await ide.listDir(dir);
+    const skillFiles: string[] = [];
+    for (const [name, type] of entries) {
+      if (type === 2 /* FileType.Directory */) {
+        const skillFile = joinPathsToUri(dir, name, "SKILL.md");
+        const fileExists = await ide.fileExists(skillFile);
+        if (fileExists) {
+          skillFiles.push(skillFile);
+        }
+      }
+    }
+    return skillFiles;
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Get skills from .claude/skills directory
  */
 async function getClaudeSkillsDir(ide: IDE) {
@@ -28,17 +53,7 @@ async function getClaudeSkillsDir(ide: IDE) {
   fullDirs.push(localPathToUri(getGlobalFolderWithName(SKILLS_DIR)));
 
   return (
-    await Promise.all(
-      fullDirs.map(async (dir) => {
-        const exists = await ide.fileExists(dir);
-        if (!exists) return [];
-        const uris = await walkDir(dir, ide, {
-          source: "get .claude skills files",
-        });
-        // filter markdown files only
-        return uris.filter((uri) => uri.endsWith(".md"));
-      }),
-    )
+    await Promise.all(fullDirs.map((dir) => getSkillFilesFromDir(ide, dir)))
   ).flat();
 }
 

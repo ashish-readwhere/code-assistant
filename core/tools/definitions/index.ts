@@ -12,6 +12,7 @@ export { readFileTool } from "./readFile";
 
 export { readFileRangeTool } from "./readFileRange";
 export { readSkillTool } from "./readSkill";
+export { createSkillTool } from "./createSkill";
 export { requestRuleTool } from "./requestRule";
 export { runTerminalCommandTool } from "./runTerminalCommand";
 export { searchWebTool } from "./searchWeb";
