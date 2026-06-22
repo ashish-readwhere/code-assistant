@@ -51,9 +51,10 @@ print_menu() {
   echo -e "  ${CYAN}7${RESET}  Watch mode         ${DIM}(esbuild-watch + gui dev in parallel)${RESET}"
   echo -e "  ${CYAN}8${RESET}  Run tests          ${DIM}(extension unit tests)${RESET}"
   echo -e "  ${CYAN}9${RESET}  Show version       ${DIM}(current package.json version)${RESET}"
+  echo -e "  ${CYAN}s${RESET}  Share info         ${DIM}(file path + install command for teammates)${RESET}"
   echo -e "  ${CYAN}0${RESET}  Exit"
   echo ""
-  echo -ne "  ${BOLD}Enter choice [0-9]:${RESET} "
+  echo -ne "  ${BOLD}Enter choice [0-9/s]:${RESET} "
 }
 
 # ── tasks ────────────────────────────────────────────────
@@ -153,6 +154,31 @@ do_tests() {
   ok "Tests complete"
 }
 
+do_share_info() {
+  step "Share Info"
+  local version
+  version=$(node -p "require('$ROOT/extensions/vscode/package.json').version")
+  local vsix="$ROOT/extensions/vscode/build/code-assistant-${version}.vsix"
+
+  if [ ! -f "$vsix" ]; then
+    err ".vsix not found — run option 1 or 5 first to build it"
+    return 1
+  fi
+
+  local size
+  size=$(du -sh "$vsix" | cut -f1)
+
+  echo -e "  ${BOLD}File path:${RESET}"
+  echo -e "  ${YELLOW}$vsix${RESET}"
+  echo -e "  ${DIM}Size: $size${RESET}"
+  echo ""
+  echo -e "  ${BOLD}Install command (share this with teammates):${RESET}"
+  echo -e "  ${GREEN}code --install-extension code-assistant-${version}.vsix${RESET}"
+  echo ""
+  echo -e "  ${DIM}After installing, reload VS Code:${RESET}"
+  echo -e "  ${DIM}Ctrl+Shift+P → Reload Window${RESET}"
+}
+
 do_show_version() {
   step "Current Version"
   local version
@@ -192,6 +218,7 @@ while true; do
     7) do_watch_mode ;;
     8) do_tests ;;
     9) do_show_version ;;
+    s|S) do_share_info ;;
     0) echo -e "\n${DIM}Bye.${RESET}\n"; exit 0 ;;
     *) err "Invalid option. Enter a number between 0-9." ;;
   esac
