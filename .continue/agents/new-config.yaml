@@ -1,0 +1,52 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: Example Config
+version: 1.0.0
+schema: v1
+
+# Define which models can be used
+# https://docs.continue.dev/customization/models
+models:
+  - name: qwen2.5-coder 7b (llmgem)
+    provider: openai
+    model: qwen2.5-coder:7b
+    apiBase: https://llmgem.sortd.pro/v1
+    apiKey: dummy
+    roles:
+      - chat
+      - edit
+      - apply
+      - autocomplete
+
+  - name: qwen3.5 2b (llmgem)
+    provider: openai
+    model: qwen3.5:2b
+    apiBase: https://llmgem.sortd.pro/v1
+    apiKey: dummy
+    roles:
+      - chat
+      - edit
+      - apply
+
+  - name: gemma 2b (llmgem)
+    provider: openai
+    model: gemma:2b
+    apiBase: https://llmgem.sortd.pro/v1
+    apiKey: dummy
+    roles:
+      - chat
+      - edit
+      - apply
+
+  - name: qwen3-vl 2b (llmgem)
+    provider: openai
+    model: qwen3-vl:2b
+    apiBase: https://llmgem.sortd.pro/v1
+    apiKey: dummy
+    roles:
+      - chat
+      - edit
+      - apply
+    capabilities:
+      - image_input
