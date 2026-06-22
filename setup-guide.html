@@ -1,0 +1,600 @@
+<title>code-assistant — setup guide</title>
+
+<style>
+  :root {
+    --ground:   #141B2D;
+    --surface:  #1E2840;
+    --surface2: #253050;
+    --border:   #2C3A56;
+    --text:     #DDE4F0;
+    --muted:    #6A7A96;
+    --accent:   #F5C518;
+    --teal:     #4FCFBF;
+    --mono: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Consolas', 'Menlo', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .prompt-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .prompt-tilde { color: var(--teal); font-size: 16px; user-select: none; }
+
+  .cursor {
+    display: inline-block;
+    width: 9px;
+    height: 20px;
+    background: var(--accent);
+    vertical-align: middle;
+    animation: blink 1.1s step-end infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+
+  .header-title {
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .header-title span { color: var(--accent); }
+
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 14px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+
+  /* ── PREREQS ── */
+  .prereqs-section { margin-bottom: 52px; }
+
+  .prereqs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .prereq {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px 18px;
+    min-width: 140px;
+  }
+
+  .prereq-name {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  .prereq-val {
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  /* ── STEPS ── */
+  .steps-section { margin-bottom: 52px; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 0 20px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 26px;
+    bottom: -28px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .step:last-child::before { display: none; }
+
+  .step-num {
+    font-size: 11px;
+    color: var(--accent);
+    padding-top: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .step-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  /* ── COMMAND BLOCK ── */
+  .cmd-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--border);
+    padding: 12px 16px;
+  }
+
+  .cmd-block.hot { border-left-color: var(--accent); }
+
+  .cmd-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 2px 0;
+  }
+
+  .cmd-line + .cmd-line { margin-top: 4px; }
+
+  .ps { color: var(--teal); flex-shrink: 0; user-select: none; }
+
+  .cmd { color: var(--text); font-size: 13px; word-break: break-all; }
+
+  .cmd .dir { color: var(--teal); }
+
+  .cmd .flag { color: var(--muted); }
+
+  .cmd-comment {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 6px 0 2px 20px;
+    font-style: italic;
+  }
+
+  /* ── ONE-LINER ── */
+  .oneliner-section { margin-bottom: 52px; }
+
+  .oneliner-block {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    padding: 24px 20px;
+  }
+
+  .oneliner-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .oneliner-code {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 2;
+  }
+
+  .oneliner-code .and { color: var(--muted); }
+  .oneliner-code .dir { color: var(--teal); }
+
+  /* ── INSTALL ── */
+  .install-section { margin-bottom: 52px; }
+
+  .install-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .install-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+  .install-note code {
+    color: var(--teal);
+    background: var(--surface2);
+    padding: 1px 5px;
+  }
+
+  /* ── RENAME CALLOUT ── */
+  .rename-section { margin-bottom: 52px; }
+
+  .rename-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--teal);
+    padding: 18px 20px;
+  }
+
+  .rename-block .rename-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .rename-block .rename-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .rename-block .rename-body code {
+    color: var(--text);
+    background: var(--surface2);
+    padding: 1px 5px;
+  }
+
+  .rename-block .rename-body .field { color: var(--accent); }
+
+  /* ── SCRIPTS TABLE ── */
+  .scripts-section { margin-bottom: 52px; }
+
+  .scripts-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .scripts-table thead tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .scripts-table th {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400;
+    text-align: left;
+    padding: 0 0 10px;
+  }
+
+  .scripts-table th:first-child { width: 260px; }
+
+  .scripts-table td {
+    padding: 10px 0;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .scripts-table td:first-child { color: var(--teal); }
+  .scripts-table td:last-child  { color: var(--muted); padding-left: 20px; }
+
+  .scripts-table tbody tr:hover td { color: var(--text); }
+  .scripts-table tbody tr:hover td:first-child { color: var(--teal); }
+
+  /* ── DEV SECTION ── */
+  .dev-section { margin-bottom: 52px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .footer .repo { color: var(--teal); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header-title { font-size: 36px; }
+    .step { grid-template-columns: 36px 1fr; }
+    .scripts-table th:first-child { width: 160px; }
+  }
+</style>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="prompt-row">
+    <span class="prompt-tilde">~</span>
+    <span class="cursor" aria-hidden="true"></span>
+  </div>
+  <h1 class="header-title">code<span>-</span>assistant</h1>
+  <p class="header-sub">setup guide &mdash; from git clone to .vsix in one terminal session</p>
+</header>
+
+<!-- PREREQUISITES -->
+<section class="prereqs-section" aria-labelledby="prereq-label">
+  <div class="label" id="prereq-label">prerequisites</div>
+  <div class="prereqs">
+    <div class="prereq">
+      <div class="prereq-name">Node.js</div>
+      <div class="prereq-val">&gt;= 20.20.1</div>
+    </div>
+    <div class="prereq">
+      <div class="prereq-name">npm</div>
+      <div class="prereq-val">bundled with Node</div>
+    </div>
+    <div class="prereq">
+      <div class="prereq-name">Vite</div>
+      <div class="prereq-val">npm install -g vite</div>
+    </div>
+    <div class="prereq">
+      <div class="prereq-name">Git</div>
+      <div class="prereq-val">any recent version</div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="steps-section" aria-labelledby="steps-label">
+  <div class="label" id="steps-label">setup steps</div>
+
+  <div class="step">
+    <div class="step-num">01</div>
+    <div class="step-body">
+      <div class="step-title">Clone the repository</div>
+      <div class="cmd-block">
+        <div class="cmd-line">
+          <span class="ps">$</span>
+          <span class="cmd">git clone git@github.com:ashish-readwhere/code-assistant.git</span>
+        </div>
+        <div class="cmd-line">
+          <span class="ps">$</span>
+          <span class="cmd">cd code-assistant</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">02</div>
+    <div class="step-body">
+      <div class="step-title">Install Vite globally</div>
+      <div class="step-note">Required once per machine. Skip if already installed.</div>
+      <div class="cmd-block">
+        <div class="cmd-line">
+          <span class="ps">$</span>
+          <span class="cmd">npm install <span class="flag">-g</span> vite</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">03</div>
+    <div class="step-body">
+      <div class="step-title">Install root dependencies</div>
+      <div class="cmd-block">
+        <div class="cmd-line">
+          <span class="ps">$</span>
+          <span class="cmd">npm install</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">04</div>
+    <div class="step-body">
+      <div class="step-title">Build workspace packages</div>
+      <div class="step-note">Local packages must be compiled before the GUI or extension can resolve them. Build in dependency order.</div>
+      <div class="cmd-block">
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd packages/config-types &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; cd ../..</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd packages/llm-info &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; cd ../..</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd packages/terminal-security &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; cd ../..</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd packages/fetch &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; cd ../..</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd packages/config-yaml &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; cd ../..</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd packages/openai-adapters &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; cd ../..</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">05</div>
+    <div class="step-body">
+      <div class="step-title">Install core dependencies</div>
+      <div class="step-note">The GUI imports directly from <code style="color:var(--teal); background:var(--surface2); padding:1px 4px;">core/</code> — its deps must be present.</div>
+      <div class="cmd-block">
+        <div class="cmd-line">
+          <span class="ps">$</span>
+          <span class="cmd">cd core &amp;&amp; npm install &amp;&amp; cd ..</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">06</div>
+    <div class="step-body">
+      <div class="step-title">Build the GUI</div>
+      <div class="step-note">Compiles the React frontend via Vite. Output is bundled into the extension package.</div>
+      <div class="cmd-block">
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd gui &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; cd ..</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">07</div>
+    <div class="step-body">
+      <div class="step-title">Package the extension</div>
+      <div class="step-note">Produces the installable <code style="color:var(--teal); background:var(--surface2); padding:1px 4px;">.vsix</code> inside <code style="color:var(--teal); background:var(--surface2); padding:1px 4px;">extensions/vscode/build/</code></div>
+      <div class="cmd-block hot">
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">cd extensions/vscode</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">npm install</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">npm run esbuild</span></div>
+        <div class="cmd-line"><span class="ps">$</span><span class="cmd">npm run package</span></div>
+        <div class="cmd-comment"># outputs: build/&lt;name&gt;-&lt;version&gt;.vsix</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ONE-LINER -->
+<section class="oneliner-section" aria-labelledby="oneliner-label">
+  <div class="label" id="oneliner-label">run everything at once &mdash; from repo root</div>
+  <div class="oneliner-block">
+    <div class="oneliner-eyebrow">full setup &mdash; one command</div>
+    <div class="oneliner-code">
+      npm install <span class="and">&amp;&amp;</span> npm install <span class="flag" style="color:var(--muted)">-g</span> vite <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd packages/config-types</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run build <span class="and">&amp;&amp;</span> <span class="dir">cd ../..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd packages/llm-info</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run build <span class="and">&amp;&amp;</span> <span class="dir">cd ../..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd packages/terminal-security</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run build <span class="and">&amp;&amp;</span> <span class="dir">cd ../..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd packages/fetch</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run build <span class="and">&amp;&amp;</span> <span class="dir">cd ../..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd packages/config-yaml</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run build <span class="and">&amp;&amp;</span> <span class="dir">cd ../..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd packages/openai-adapters</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run build <span class="and">&amp;&amp;</span> <span class="dir">cd ../..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd core</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> <span class="dir">cd ..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd gui</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run build <span class="and">&amp;&amp;</span> <span class="dir">cd ..</span> <span class="and">&amp;&amp;</span><br>
+      <span class="dir">cd extensions/vscode</span> <span class="and">&amp;&amp;</span> npm install <span class="and">&amp;&amp;</span> npm run esbuild <span class="and">&amp;&amp;</span> npm run package
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL THE VSIX -->
+<section class="install-section" aria-labelledby="install-label">
+  <div class="label" id="install-label">install the extension</div>
+  <div class="install-block">
+    <div class="cmd-block" style="border:none; padding:0; background:transparent;">
+      <div class="cmd-line">
+        <span class="ps">$</span>
+        <span class="cmd">code --install-extension extensions/vscode/build/*.vsix</span>
+      </div>
+    </div>
+    <div class="install-note">
+      Or right-click the <code>.vsix</code> file in VS Code Explorer &rarr; <strong style="color:var(--text)">Install Extension VSIX</strong>.<br>
+      The output filename is controlled by <code>name</code> and <code>version</code> in <code>extensions/vscode/package.json</code>.
+      Update those fields to rename the packaged file.
+    </div>
+  </div>
+</section>
+
+<!-- RENAME CALLOUT -->
+<section class="rename-section" aria-labelledby="rename-label">
+  <div class="label" id="rename-label">rename the extension</div>
+  <div class="rename-block">
+    <div class="rename-title">Update extensions/vscode/package.json</div>
+    <div class="rename-body">
+      Three fields control the identity of the packaged extension. Edit them before running <code>npm run package</code>:<br><br>
+      <span class="field">"name"</span> &mdash; sets the .vsix filename &rarr; <code>"code-assistant"</code><br>
+      <span class="field">"displayName"</span> &mdash; shown in VS Code Extensions panel &rarr; <code>"Code Assistant"</code><br>
+      <span class="field">"publisher"</span> &mdash; used by vsce for marketplace publishing &rarr; your publisher ID
+    </div>
+  </div>
+</section>
+
+<!-- KEY SCRIPTS -->
+<section class="scripts-section" aria-labelledby="scripts-label">
+  <div class="label" id="scripts-label">key scripts &mdash; extensions/vscode/</div>
+  <div style="overflow-x: auto;">
+    <table class="scripts-table">
+      <thead>
+        <tr>
+          <th>command</th>
+          <th>what it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>npm run esbuild</td>
+          <td>compile extension with source maps (development build)</td>
+        </tr>
+        <tr>
+          <td>npm run esbuild-watch</td>
+          <td>compile + watch — rebuilds on every file save</td>
+        </tr>
+        <tr>
+          <td>npm run package</td>
+          <td>produce a release-ready .vsix in build/</td>
+        </tr>
+        <tr>
+          <td>npm run package:pre-release</td>
+          <td>same, flagged as a pre-release version</td>
+        </tr>
+        <tr>
+          <td>npm run tsc:check</td>
+          <td>TypeScript type-check only, no output files</td>
+        </tr>
+        <tr>
+          <td>npm run test</td>
+          <td>run unit tests with Vitest</td>
+        </tr>
+        <tr>
+          <td>npm run lint</td>
+          <td>ESLint check across src/</td>
+        </tr>
+        <tr>
+          <td>npm run lint:fix</td>
+          <td>auto-fix lint errors where possible</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- DEV WORKFLOW -->
+<section class="dev-section" aria-labelledby="dev-label">
+  <div class="label" id="dev-label">active development workflow</div>
+  <div class="cmd-block" style="background:var(--surface); border:1px solid var(--border); padding:18px 20px;">
+    <div class="cmd-comment" style="padding-left:0; padding-bottom:8px;"># terminal 1 &mdash; watch extension source</div>
+    <div class="cmd-line">
+      <span class="ps">$</span>
+      <span class="cmd"><span class="dir">extensions/vscode/</span> npm run esbuild-watch</span>
+    </div>
+    <div style="height: 14px;"></div>
+    <div class="cmd-comment" style="padding-left:0; padding-bottom:8px;"># terminal 2 &mdash; watch GUI source</div>
+    <div class="cmd-line">
+      <span class="ps">$</span>
+      <span class="cmd"><span class="dir">gui/</span> npm run dev</span>
+    </div>
+    <div style="height: 14px;"></div>
+    <div class="cmd-comment" style="padding-left:0; padding-bottom:8px;"># then press F5 in VS Code to launch the extension in debug mode</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span><span class="repo">git@github.com:ashish-readwhere/code-assistant.git</span></span>
+  <span>node &gt;= 20.20.1 &nbsp;&middot;&nbsp; vsce package</span>
+</footer>
